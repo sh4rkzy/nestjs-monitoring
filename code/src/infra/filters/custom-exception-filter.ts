@@ -8,6 +8,7 @@ import {
     Injectable,
 } from '@nestjs/common'
 import { Observable } from 'rxjs'
+import { generateTransactionId } from 'src/shared/utils/utilities'
 
 @Injectable()
 export class CustomExceptionFilter implements ExceptionFilter {
@@ -19,7 +20,7 @@ export class CustomExceptionFilter implements ExceptionFilter {
         const ctx = host.switchToHttp()
         const request = ctx.getRequest<Request>()
         const response = ctx.getResponse<Response>()
-        let globalTransactionId = request.headers['globaltransactionid'] as string ?? crypto.randomUUID()
+        let transactionId = request.headers['globaltransactionid'] as string ?? generateTransactionId()
         switch (exception.constructor) {
             case BadRequestException:
                 this.logger.error(`BadRequestException: ${exception.message}`, exception.stack, request.url)
@@ -27,7 +28,7 @@ export class CustomExceptionFilter implements ExceptionFilter {
                     error: HttpStatus.BAD_REQUEST,
                     description: exception.message ?? 'Error in request',
                     transaction: {
-                        globalTransactionId: globalTransactionId,
+                        requestTransactionId: transactionId,
                         timestampTransaction: new Date()
                             .toISOString()
                             .replace('T', ' ')
@@ -42,7 +43,7 @@ export class CustomExceptionFilter implements ExceptionFilter {
                     error: HttpStatus.INTERNAL_SERVER_ERROR,
                     description: exception.message ?? 'Failed internal server error',
                     transaction: {
-                        globalTransactionId: globalTransactionId,
+                        requestTransactionId: transactionId,
                         timestampTransaction: new Date()
                             .toISOString()
                             .replace('T', ' ')

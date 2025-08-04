@@ -1,7 +1,7 @@
+import { DatabaseModule } from './infra/database/database.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { HealthModule } from './modules/health/health.module';
-import { HealthController } from './modules/health/health.controller';
 
 @Module({
   imports: [
@@ -10,6 +10,7 @@ import { HealthController } from './modules/health/health.controller';
       envFilePath: ['.env', '.env.local'],
     }),
     HealthModule,
+    DatabaseModule
   ],
   controllers: [],
   providers: [],
